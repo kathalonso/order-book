@@ -1,0 +1,16 @@
+let a = 1;
+let b = 2;
+
+if (a === 1) console.log('one');
+if (b === 2) console.log('two');
+
+/////
+
+
+
+let a = 1;
+let b = 2;
+
+if (a === 0) console.log('one');
+else if (b === 1.5) console.log('1.5');
+else if (b === 2)consle.log('two)

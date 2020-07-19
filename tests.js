@@ -5,18 +5,18 @@ const reconcileOrder = require('./orderBook')
 
 describe('Order Book', () => {
   describe('reconcileOrder', () => {
-    it('adds an order to the book when the book is empty and thus cannot fulfill the order', () => {
+    it('adds an order to the book when the book is empty and thus cannot fulfill the order', () => { //1
       const existingBook = []
       const incomingOrder = { type: 'sell', quantity: 10, price: 6150 }
 
-      const updatedBook = reconcileOrder(existingBook, incomingOrder)
+      const updatedBook = reconcileOrder(existingBook, incomingOrder)       // (val1, val2)
 
       expect(updatedBook).to.deep.equal([{ type: 'sell', quantity: 10, price: 6150 }])
     })
 
-    it('adds an order to the book when the book has orders of the corresponding type (i.e. a sell with no buys)', () => {
-      const existingBook = [{ type: 'sell', quantity: 10, price: 6150 }]
-      const incomingOrder = { type: 'sell', quantity: 12, price: 6000 }
+    it('adds an order to the book when the book has orders of the corresponding type (i.e. a sell with no buys)', () => {  //2
+      const existingBook = [{ type: 'sell', quantity: 10, price: 6150 }]    //object inside of array        eB[0].quantity, 
+      const incomingOrder = { type: 'sell', quantity: 12, price: 6000 }    // object                  iO.quantity
 
       const updatedBook = reconcileOrder(existingBook, incomingOrder)
 
@@ -26,7 +26,7 @@ describe('Order Book', () => {
       ])
     })
 
-    it('adds an order to the book when the book has a corresponding order type but it does not match', () => {
+    it('adds an order to the book when the book has a corresponding order type but it does not match', () => {   //3, if type, then if q & p?
       const existingBook = [{ type: 'buy', quantity: 10, price: 6000 }]
       const incomingOrder = { type: 'sell', quantity: 12, price: 6150 }
 
@@ -38,7 +38,7 @@ describe('Order Book', () => {
       ])
     })
 
-    it('fulfills an order and removes the matching order when the book contains a matching order of the same quantity', () => {
+    it('fulfills an order and removes the matching order when the book contains a matching order of the same quantity', () => {   //4
       const existingBook = [{ type: 'buy', quantity: 10, price: 6150 }, { type: 'sell', quantity: 12, price: 6250 }]
       const incomingOrder = { type: 'sell', quantity: 10, price: 6150 }
 
@@ -47,17 +47,17 @@ describe('Order Book', () => {
       expect(updatedBook).to.deep.equal([{ type: 'sell', quantity: 12, price: 6250 }])
     })
 
-    it('fulfills an order and reduces the matching order when the book contains a matching order of a larger quantity', () => {
+    it('fulfills an order and reduces the matching order when the book contains a matching order of a larger quantity', () => {   //5
       const existingBook = [{ type: 'buy', quantity: 15, price: 6150 }, { type: 'sell', quantity: 12, price: 6950 }]
       const incomingOrder = { type: 'sell', quantity: 10, price: 6150 }
 
       const updatedBook = reconcileOrder(existingBook, incomingOrder)
 
-      expect(updatedBook).to.deep.equal([{ type: 'sell', quantity: 12, price: 6950 }, { type: 'buy', quantity: 5, price: 6150 }])
+      expect(updatedBook).to.deep.equal([{ type: 'sell', quantity: 12, price: 6950 }, { type: 'buy', quantity: 5, price: 6150 }])  
     })
 
     it('partially fulfills an order, removes the matching order and adds the remainder of the order to the book when the book contains a matching order of a smaller quantity', () => {
-      const existingBook = [{ type: 'buy', quantity: 10, price: 6150 }, { type: 'sell', quantity: 12, price: 5950 }]
+      const existingBook = [{ type: 'buy', quantity: 10, price: 6150 }, { type: 'sell', quantity: 12, price: 5950 }]      //6
       const incomingOrder = { type: 'sell', quantity: 15, price: 6150 }
 
       const updatedBook = reconcileOrder(existingBook, incomingOrder)
@@ -65,9 +65,12 @@ describe('Order Book', () => {
       expect(updatedBook).to.deep.equal([{ type: 'sell', quantity: 12, price: 5950 }, { type: 'sell', quantity: 5, price: 6150 }])
     })
 
-    it('uses two existing orders to completely fulfill an order, removing the matching orders from the book', () => {
+    it('uses two existing orders to completely fulfill an order, removing the matching orders from the book', () => {    //7
       const existingBook = [{ type: 'buy', quantity: 10, price: 6150 }, { type: 'buy', quantity: 5, price: 6150 }, { type: 'sell', quantity: 12, price: 5950 }]
-      const incomingOrder = { type: 'sell', quantity: 15, price: 6150 }
+      const incomingOrder = { type: 'sell', quantity: 15, price: 6150 } 
+      
+      // const existingBook = [{ type: 'buy', quantity: 5, price: 6150 }, { type: 'sell', quantity: 12, price: 5950 }]
+      // const incomingOrder = { type: 'sell', quantity: 5, price: 6150 }
 
       const updatedBook = reconcileOrder(existingBook, incomingOrder)
 
@@ -76,7 +79,7 @@ describe('Order Book', () => {
 
     it('uses two existing orders to completely fulfill an order, removing the first matching order from the book and reducing the second', () => {
       const existingBook = [{ type: 'buy', quantity: 10, price: 6150 }, { type: 'buy', quantity: 10, price: 6150 }, { type: 'sell', quantity: 12, price: 6950 }]
-      const incomingOrder = { type: 'sell', quantity: 15, price: 6150 }
+      const incomingOrder = { type: 'sell', quantity: 15, price: 6150 }                                               //8
 
       const updatedBook = reconcileOrder(existingBook, incomingOrder)
 
@@ -85,7 +88,7 @@ describe('Order Book', () => {
 
     it('uses two existing orders to partially fulfill an order, removing the matching orders from the book and reducing the incoming order before adding it to the book', () => {
       const existingBook = [{ type: 'buy', quantity: 10, price: 6150 }, { type: 'buy', quantity: 10, price: 6150 }, { type: 'sell', quantity: 12, price: 6950 }]
-      const incomingOrder = { type: 'sell', quantity: 25, price: 6150 }
+      const incomingOrder = { type: 'sell', quantity: 25, price: 6150 }                               //9
 
       const updatedBook = reconcileOrder(existingBook, incomingOrder)
 
